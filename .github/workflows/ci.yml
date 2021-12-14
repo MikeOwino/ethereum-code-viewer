@@ -19,14 +19,17 @@ jobs:
         with:
           node-version: "14"
           cache: pnpm
+
       - run: pnpm install
-      - name: Build
-        run: pnpm build
-      - name: Deploy
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: dswistowski/surge-sh-action@v1
+      - run: pnpm build
+
+      - run: pnpm prepare-deploy
+      - uses: ngduc/vercel-deploy-action@master
         with:
-          domain: "ethereum-viewer.surge.sh"
-          project: "./packages/vscode-host/dist"
-          login: ${{ secrets.SURGE_LOGIN }}
-          token: ${{ secrets.SURGE_TOKEN }}
+          vercel-cli: vercel
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # vercel-args: "--prod" #Optional
+          working-directory: packages/vscode-host/dist
